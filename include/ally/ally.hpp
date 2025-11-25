@@ -90,10 +90,7 @@ struct plugin_loader {
     /**
      * @brief Get the last error message
      */
-    std::string last_error() const {
-        const char* error = ally_last_error();
-        return error ? error : "";
-    }
+    std::string last_error() const { return std::string{ally_last_error()}; }
 
     /**
      * @brief Get the path to the loaded plugin
