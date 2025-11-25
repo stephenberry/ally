@@ -101,6 +101,7 @@ struct plugin_loader {
 
     /**
      * @brief Arrow operator for convenient access to plugin interface
+     * @pre is_loaded() must be true; using this on an unloaded plugin is undefined behavior
      */
     PluginType* operator->() const noexcept {
         return get();
@@ -108,6 +109,7 @@ struct plugin_loader {
 
     /**
      * @brief Dereference operator
+     * @pre is_loaded() must be true; dereferencing an unloaded plugin is undefined behavior
      */
     PluginType& operator*() const noexcept {
         return *get();
