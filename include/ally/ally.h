@@ -10,8 +10,8 @@
  * namespace convention based on the plugin filename.
  *
  * Example:
- *   - calculator.so defines: ally_calculator_type, ally_calculator_name, ally_calculator_version
- *   - renderer.so defines: ally_renderer_type, ally_renderer_name, ally_renderer_version
+ *   - calculator.so defines: ally_calculator_type, ally_calculator_version
+ *   - renderer.so defines: ally_renderer_type, ally_renderer_version
  *
  * This allows multiple different plugin types to be loaded in the same application
  * without name collisions.

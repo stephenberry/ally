@@ -8,6 +8,7 @@ A lightweight plugin system for C and C++ with a pure C interface. Load shared l
 - **C++ Wrapper** - Optional RAII wrapper for C++ convenience
 - **Cross-Platform** - Works on Windows, Linux, and macOS
 - **Simple API** - Load plugins in 3 lines of code
+- **Standards** - Requires C11 or C++17
 
 ## Architecture
 
@@ -32,8 +33,13 @@ cmake ..
 cmake --build .
 ```
 
+Optional CMake flags:
+- `-DBUILD_EXAMPLES=OFF` - Skip example plugins and hosts
+- `-DBUILD_TESTS=OFF` - Skip unit tests
+- `-DBUILD_SHARED_LIBS=OFF` - Build as static library
+
 This builds:
-- `libally` - Core plugin loading library
+- `libally` - Core plugin loading library (.so/.dylib/.dll depending on platform)
 - Example plugins (calculator, string processor)
 - Example hosts (C and C++)
 
@@ -45,6 +51,19 @@ This builds:
 
 # Run C++ host with string processor plugin
 ./cpp_host ./string_processor_plugin
+```
+
+### Running Tests
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+Or run individual tests:
+```bash
+./build/test_c_api
+./build/test_cpp_api
+./build/test_multi_plugin
 ```
 
 ## Creating a Plugin
@@ -390,7 +409,7 @@ Check if plugin is currently loaded.
 
 #### `const char* ally_last_error(void)`
 
-Get error message from last failed operation.
+Get error message from last failed operation. Uses thread-local storage, so each thread has its own error buffer. The returned pointer is valid until the next `ally_*` call on the same thread.
 
 #### `const char* ally_plugin_path(ally_handle_t handle)`
 
@@ -439,6 +458,8 @@ gcc -shared -fPIC -o libmy_plugin.so my_plugin.c
 ```
 
 Load with: `ally_load("./my_plugin")`
+
+When linking a host application with static libally, add `-ldl`.
 
 ### macOS
 
