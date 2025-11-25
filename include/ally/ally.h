@@ -110,8 +110,9 @@ ALLY_API bool ALLY_CALL ally_is_loaded(ally_handle_t handle);
 /**
  * @brief Get the last error message from a failed operation
  *
- * Returns a pointer to a static buffer containing the error message.
- * This string is valid until the next call to any ally_* function.
+ * Returns a pointer to a thread-local buffer containing the error message.
+ * This string is valid until the next call to any ally_* function on the
+ * same thread. Calls from other threads do not affect this thread's error.
  *
  * @return Error message string, or empty string if no error
  */
@@ -119,6 +120,9 @@ ALLY_API const char* ALLY_CALL ally_last_error(void);
 
 /**
  * @brief Get the full path to the loaded plugin library
+ *
+ * Returns a pointer to internal storage. This pointer is valid only while
+ * the handle remains loaded. After ally_unload(), the pointer becomes invalid.
  *
  * @param handle Handle to query
  * @return Full path to the plugin library, or NULL if handle is invalid

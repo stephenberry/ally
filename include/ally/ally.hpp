@@ -27,7 +27,6 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <utility>
 
 namespace ally {
 
@@ -64,7 +63,7 @@ struct plugin_loader {
      * @param plugin_path Path to the plugin (can omit extension)
      * @return true on success, false on failure (check last_error())
      */
-    bool load(const std::string& plugin_path) {
+    [[nodiscard]] bool load(const std::string& plugin_path) {
         handle_.reset(ally_load(plugin_path.c_str()));
         return static_cast<bool>(handle_);
     }
@@ -72,55 +71,54 @@ struct plugin_loader {
     /**
      * @brief Unload the plugin
      */
-    void unload() { handle_.reset(); }
+    void unload() noexcept { handle_.reset(); }
 
     /**
      * @brief Get the plugin interface
      * @return Pointer to plugin interface, or nullptr if not loaded
      */
-    PluginType* get() const {
+    [[nodiscard]] PluginType* get() const noexcept {
         return static_cast<PluginType*>(ally_get(handle_.get()));
     }
 
     /**
      * @brief Check if plugin is loaded
      */
-    bool is_loaded() const { return ally_is_loaded(handle_.get()); }
+    [[nodiscard]] bool is_loaded() const noexcept { return ally_is_loaded(handle_.get()); }
 
     /**
      * @brief Get the last error message
      */
-    std::string last_error() const {
-        const char* error = ally_last_error();
-        return error ? error : "";
-    }
+    [[nodiscard]] std::string last_error() const { return std::string{ally_last_error()}; }
 
     /**
      * @brief Get the path to the loaded plugin
      */
-    std::string plugin_path() const {
+    [[nodiscard]] std::string plugin_path() const {
         const char* path = ally_plugin_path(handle_.get());
         return path ? path : "";
     }
 
     /**
      * @brief Arrow operator for convenient access to plugin interface
+     * @pre is_loaded() must be true; using this on an unloaded plugin is undefined behavior
      */
-    PluginType* operator->() const {
+    PluginType* operator->() const noexcept {
         return get();
     }
 
     /**
      * @brief Dereference operator
+     * @pre is_loaded() must be true; dereferencing an unloaded plugin is undefined behavior
      */
-    PluginType& operator*() const {
+    PluginType& operator*() const noexcept {
         return *get();
     }
 
     /**
      * @brief Bool conversion operator
      */
-    explicit operator bool() const {
+    explicit operator bool() const noexcept {
         return is_loaded();
     }
 
@@ -147,7 +145,7 @@ private:
  * loader->add(1, 2);  // Use plugin
  */
 template<class PluginType>
-inline plugin_loader<PluginType> load_plugin(const std::string& plugin_path) {
+[[nodiscard]] inline plugin_loader<PluginType> load_plugin(const std::string& plugin_path) {
     plugin_loader<PluginType> loader;
     if (!loader.load(plugin_path)) {
         throw std::runtime_error("Failed to load plugin: " + loader.last_error());
