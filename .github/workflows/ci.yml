@@ -29,7 +29,7 @@ jobs:
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Configure
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build build --config Release
@@ -37,22 +37,12 @@ jobs:
     - name: Test
       run: ctest --test-dir build --output-on-failure -C Release
 
-    - name: Run C Host Example (Unix)
-      if: runner.os != 'Windows'
+    - name: Run C Host Example
       run: ./build/c_host ./build/calculator_plugin
-
-    - name: Run C Host Example (Windows)
-      if: runner.os == 'Windows'
-      run: ./build/Release/c_host.exe ./build/Release/calculator_plugin.dll
       shell: bash
 
-    - name: Run C++ Host Example (Unix)
-      if: runner.os != 'Windows'
+    - name: Run C++ Host Example
       run: ./build/cpp_host ./build/string_processor_plugin
-
-    - name: Run C++ Host Example (Windows)
-      if: runner.os == 'Windows'
-      run: ./build/Release/cpp_host.exe ./build/Release/string_processor_plugin.dll
       shell: bash
 
   code-quality:
