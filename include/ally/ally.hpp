@@ -64,7 +64,7 @@ struct plugin_loader {
      * @param plugin_path Path to the plugin (can omit extension)
      * @return true on success, false on failure (check last_error())
      */
-    bool load(const std::string& plugin_path) {
+    [[nodiscard]] bool load(const std::string& plugin_path) {
         handle_.reset(ally_load(plugin_path.c_str()));
         return static_cast<bool>(handle_);
     }
@@ -78,24 +78,24 @@ struct plugin_loader {
      * @brief Get the plugin interface
      * @return Pointer to plugin interface, or nullptr if not loaded
      */
-    PluginType* get() const {
+    [[nodiscard]] PluginType* get() const {
         return static_cast<PluginType*>(ally_get(handle_.get()));
     }
 
     /**
      * @brief Check if plugin is loaded
      */
-    bool is_loaded() const { return ally_is_loaded(handle_.get()); }
+    [[nodiscard]] bool is_loaded() const { return ally_is_loaded(handle_.get()); }
 
     /**
      * @brief Get the last error message
      */
-    std::string last_error() const { return std::string{ally_last_error()}; }
+    [[nodiscard]] std::string last_error() const { return std::string{ally_last_error()}; }
 
     /**
      * @brief Get the path to the loaded plugin
      */
-    std::string plugin_path() const {
+    [[nodiscard]] std::string plugin_path() const {
         const char* path = ally_plugin_path(handle_.get());
         return path ? path : "";
     }
@@ -144,7 +144,7 @@ private:
  * loader->add(1, 2);  // Use plugin
  */
 template<class PluginType>
-inline plugin_loader<PluginType> load_plugin(const std::string& plugin_path) {
+[[nodiscard]] inline plugin_loader<PluginType> load_plugin(const std::string& plugin_path) {
     plugin_loader<PluginType> loader;
     if (!loader.load(plugin_path)) {
         throw std::runtime_error("Failed to load plugin: " + loader.last_error());
