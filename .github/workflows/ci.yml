@@ -8,86 +8,7 @@ on:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            triplet: x64-linux
-          - os: macos-latest
-            triplet: x64-osx
-          - os: windows-latest
-            triplet: x64-windows
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup CMake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.15.x'
-
-    - name: Setup MSVC (Windows)
-      if: runner.os == 'Windows'
-      uses: ilammy/msvc-dev-cmd@v1
-
-    - name: Configure CMake (Windows)
-      if: runner.os == 'Windows'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-
-    - name: Configure CMake (Unix)
-      if: runner.os != 'Windows'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-
-    - name: Build
-      run: cmake --build build --config Release
-
-    - name: Run C API Tests (Windows)
-      if: runner.os == 'Windows'
-      working-directory: build
-      run: ./test_c_api.exe
-      shell: bash
-
-    - name: Run C API Tests (Unix)
-      if: runner.os != 'Windows'
-      working-directory: build
-      run: ./test_c_api
-      shell: bash
-
-    - name: Run C++ API Tests (Windows)
-      if: runner.os == 'Windows'
-      working-directory: build
-      run: ./test_cpp_api.exe
-      shell: bash
-
-    - name: Run C++ API Tests (Unix)
-      if: runner.os != 'Windows'
-      working-directory: build
-      run: ./test_cpp_api
-      shell: bash
-
-    - name: Run Multi-Plugin Tests (Windows)
-      if: runner.os == 'Windows'
-      working-directory: build
-      run: ./test_multi_plugin.exe
-      shell: bash
-
-    - name: Run Multi-Plugin Tests (Unix)
-      if: runner.os != 'Windows'
-      working-directory: build
-      run: ./test_multi_plugin
-      shell: bash
-
-    - name: Run CTest (all tests)
-      working-directory: build
-      run: ctest --output-on-failure -C Release
-
-  build-examples:
-    name: Build examples on ${{ matrix.os }}
+    name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -95,7 +16,7 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Setup CMake
@@ -103,51 +24,43 @@ jobs:
       with:
         cmake-version: '3.15.x'
 
-    - name: Setup MSVC (Windows)
+    - name: Setup MSVC
       if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Configure CMake (Windows)
-      if: runner.os == 'Windows'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
-
-    - name: Configure CMake (Unix)
-      if: runner.os != 'Windows'
+    - name: Configure
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
       run: cmake --build build --config Release
 
-    - name: Run C Host Example (Windows)
-      if: runner.os == 'Windows'
-      working-directory: build
-      run: ./c_host.exe calculator_plugin.dll
-      shell: bash
+    - name: Test
+      run: ctest --test-dir build --output-on-failure -C Release
 
     - name: Run C Host Example (Unix)
       if: runner.os != 'Windows'
-      working-directory: build
-      run: ./c_host ./calculator_plugin
-      shell: bash
+      run: ./build/c_host ./build/calculator_plugin
 
-    - name: Run C++ Host Example (Windows)
+    - name: Run C Host Example (Windows)
       if: runner.os == 'Windows'
-      working-directory: build
-      run: ./cpp_host.exe string_processor_plugin.dll
+      run: ./build/Release/c_host.exe ./build/Release/calculator_plugin.dll
       shell: bash
 
     - name: Run C++ Host Example (Unix)
       if: runner.os != 'Windows'
-      working-directory: build
-      run: ./cpp_host ./string_processor_plugin
+      run: ./build/cpp_host ./build/string_processor_plugin
+
+    - name: Run C++ Host Example (Windows)
+      if: runner.os == 'Windows'
+      run: ./build/Release/cpp_host.exe ./build/Release/string_processor_plugin.dll
       shell: bash
 
   code-quality:
-    name: Code Quality Checks
+    name: Code Quality
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Setup CMake
@@ -155,12 +68,11 @@ jobs:
       with:
         cmake-version: '3.15.x'
 
-    - name: Configure CMake with warnings
+    - name: Configure
       run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Wall -Wextra -Werror" -DCMAKE_CXX_FLAGS="-Wall -Wextra -Werror"
 
-    - name: Build with warnings as errors
+    - name: Build
       run: cmake --build build
 
-    - name: Run tests
-      working-directory: build
-      run: ctest --output-on-failure
+    - name: Test
+      run: ctest --test-dir build --output-on-failure
