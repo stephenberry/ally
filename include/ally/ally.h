@@ -121,6 +121,9 @@ ALLY_API const char* ALLY_CALL ally_last_error(void);
 /**
  * @brief Get the full path to the loaded plugin library
  *
+ * Returns a pointer to internal storage. This pointer is valid only while
+ * the handle remains loaded. After ally_unload(), the pointer becomes invalid.
+ *
  * @param handle Handle to query
  * @return Full path to the plugin library, or NULL if handle is invalid
  */
