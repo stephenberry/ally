@@ -178,24 +178,10 @@ static native_handle_t try_load_variants(const char* plugin_path, char* resolved
 
     for (size_t i = 0; i < prefix_count; ++i) {
         const char* prefix = prefixes[i];
-        const bool has_prefix = prefix && prefix[0] != '\0';
-
         for (size_t j = 0; j < suffix_count; ++j) {
             const char* suffix = suffixes[j];
-            const bool has_suffix = suffix && suffix[0] != '\0';
-
-            if (!has_prefix) {
-                snprintf(candidate, sizeof(candidate), "%s%s",
-                         plugin_path,
-                         has_suffix ? suffix : "");
-            } else {
-                snprintf(candidate, sizeof(candidate), "%.*s%s%s%s",
-                         (int)dir_len,
-                         plugin_path,
-                         prefix,
-                         plugin_path + dir_len,
-                         has_suffix ? suffix : "");
-            }
+            snprintf(candidate, sizeof(candidate), "%.*s%s%s%s",
+                     (int)dir_len, plugin_path, prefix, plugin_path + dir_len, suffix);
 
             handle = load_library(candidate);
             if (handle) {
