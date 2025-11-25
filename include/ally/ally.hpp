@@ -72,20 +72,20 @@ struct plugin_loader {
     /**
      * @brief Unload the plugin
      */
-    void unload() { handle_.reset(); }
+    void unload() noexcept { handle_.reset(); }
 
     /**
      * @brief Get the plugin interface
      * @return Pointer to plugin interface, or nullptr if not loaded
      */
-    [[nodiscard]] PluginType* get() const {
+    [[nodiscard]] PluginType* get() const noexcept {
         return static_cast<PluginType*>(ally_get(handle_.get()));
     }
 
     /**
      * @brief Check if plugin is loaded
      */
-    [[nodiscard]] bool is_loaded() const { return ally_is_loaded(handle_.get()); }
+    [[nodiscard]] bool is_loaded() const noexcept { return ally_is_loaded(handle_.get()); }
 
     /**
      * @brief Get the last error message
@@ -103,21 +103,21 @@ struct plugin_loader {
     /**
      * @brief Arrow operator for convenient access to plugin interface
      */
-    PluginType* operator->() const {
+    PluginType* operator->() const noexcept {
         return get();
     }
 
     /**
      * @brief Dereference operator
      */
-    PluginType& operator*() const {
+    PluginType& operator*() const noexcept {
         return *get();
     }
 
     /**
      * @brief Bool conversion operator
      */
-    explicit operator bool() const {
+    explicit operator bool() const noexcept {
         return is_loaded();
     }
 
