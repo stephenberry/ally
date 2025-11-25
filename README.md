@@ -32,6 +32,11 @@ cmake ..
 cmake --build .
 ```
 
+Optional CMake flags:
+- `-DBUILD_EXAMPLES=OFF` - Skip example plugins and hosts
+- `-DBUILD_TESTS=OFF` - Skip unit tests
+- `-DBUILD_SHARED_LIBS=OFF` - Build as static library
+
 This builds:
 - `libally` - Core plugin loading library
 - Example plugins (calculator, string processor)
