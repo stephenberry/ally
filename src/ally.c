@@ -3,7 +3,6 @@
  * @brief Implementation of the Ally plugin system
  */
 
-#define ALLY_INTERNAL_API
 #include "ally/ally.h"
 
 #include <stdio.h>
