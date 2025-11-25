@@ -40,7 +40,7 @@
 #elif defined(__GNUC__)
     #define THREAD_LOCAL __thread
 #else
-    #define THREAD_LOCAL
+    #error "Thread-local storage not available - ally_last_error() will not be thread-safe"
 #endif
 
 /* Thread-local error message buffer */
